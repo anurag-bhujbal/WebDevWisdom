@@ -1,7 +1,9 @@
 import { Button, Spinner } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-
+import CallToAction from '../Components/CallToAction';
+import CommentSection from '../Components/CommentSection';
+import PostCard from '../Components/PostCard';
 
 export default function PostPage() {
   const { postSlug } = useParams();
@@ -34,7 +36,20 @@ export default function PostPage() {
     fetchPost();
   }, [postSlug]);
 
- 
+  useEffect(() => {
+    try {
+      const fetchRecentPosts = async () => {
+        const res = await fetch(`/api/post/getposts?limit=3`);
+        const data = await res.json();
+        if (res.ok) {
+          setRecentPosts(data.posts);
+        }
+      };
+      fetchRecentPosts();
+    } catch (error) {
+      console.log(error.message);
+    }
+  }, []);
 
   if (loading)
     return (
@@ -71,8 +86,9 @@ export default function PostPage() {
         dangerouslySetInnerHTML={{ __html: post && post.content }}
       ></div>
       <div className='max-w-4xl mx-auto w-full'>
-       
+        <CallToAction />
       </div>
+      <CommentSection postId={post._id} />
 
       <div className='flex flex-col justify-center items-center mb-5'>
         <h1 className='text-xl mt-5'>Recent articles</h1>
